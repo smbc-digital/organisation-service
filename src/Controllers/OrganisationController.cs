@@ -12,12 +12,12 @@ namespace organisation_service.Controllers
     [ApiController]
     [TokenAuthentication]
     //[OperationalToggle(OperationalToggles.organisation_service)]
-    public class HomeController : ControllerBase
+    public class OrganisationController : ControllerBase
     {
         private IAvailabilityManager _availabilityManager;
 
-        
-        public HomeController(IAvailabilityManager availabilityManager)
+
+        public OrganisationController(IAvailabilityManager availabilityManager)
         {
             _availabilityManager = availabilityManager;
         }
