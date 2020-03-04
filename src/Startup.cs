@@ -6,6 +6,8 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using organisation_service.Providers;
+using organisation_service.Services;
 using StockportGovUK.AspNetCore.Middleware;
 using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
@@ -26,6 +28,10 @@ namespace organisation_service
 
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+            services.AddSingleton<IOrganisationProvider, VerintOrganisationProvider>();
+            services.AddSingleton<IOrganisationService, OrganisationService>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2);
             services.AddHealthChecks()
                 .AddCheck<TestHealthCheck>("TestHealthCheck");
@@ -58,7 +64,7 @@ namespace organisation_service
             {
                 app.UseHsts();
             }
-            
+
             app.UseMiddleware<Availability>();
             app.UseMiddleware<ExceptionHandling>();
             app.UseHttpsRedirection();

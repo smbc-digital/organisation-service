@@ -1,9 +1,11 @@
+using System;
 using System.Threading.Tasks;
-using organisation_service.Utils.Toggles;
 using Microsoft.AspNetCore.Mvc;
+using organisation_service.Exceptions;
+using organisation_service.Services;
 using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
-using StockportGovUK.AspNetCore.Availability.Attributes;
-using StockportGovUK.AspNetCore.Availability.Managers;
+using StockportGovUK.NetStandard.Models.Enums;
+
 
 namespace organisation_service.Controllers
 {
@@ -11,29 +13,37 @@ namespace organisation_service.Controllers
     [Route("api/v1/[Controller]")]
     [ApiController]
     [TokenAuthentication]
-    //[OperationalToggle(OperationalToggles.organisation_service)]
     public class OrganisationController : ControllerBase
     {
-        private IAvailabilityManager _availabilityManager;
+        private readonly IOrganisationService _organisationService;
 
-
-        public OrganisationController(IAvailabilityManager availabilityManager)
+        public OrganisationController(IOrganisationService organisationService)
         {
-            _availabilityManager = availabilityManager;
+            _organisationService = organisationService;
         }
 
         [HttpGet]
-        // [FeatureToggle(FeatureToggles.MyToggle)]
-        public IActionResult Get()
+        [Route("{organisationProvider}/{searchTerm}")]
+        public async Task<IActionResult> Get(EOrganisationProvider organisationProvider, string searchTerm)
         {
-            return Ok();
-        }
+            if (!ModelState.IsValid)
+            {
+                return BadRequest();
+            }
 
-        [HttpPost]
-        // [FeatureToggle(FeatureToggles.MyToggle)]
-        public IActionResult Post()
-        {
-            return Ok();
+            try
+            {
+                var result = await _organisationService.SearchAsync(organisationProvider, searchTerm);
+                return Ok(result);
+            }
+            catch (ProviderException e)
+            {
+                return BadRequest();
+            }
+            catch (Exception e)
+            {
+                return StatusCode(500);
+            }
         }
     }
 }
