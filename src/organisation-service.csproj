@@ -2,7 +2,6 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp2.2</TargetFramework>
-    <AspNetCoreHostingModel>InProcess</AspNetCoreHostingModel>
     <RootNamespace>organisation_service</RootNamespace>
     <TargetLatestRuntimePatch>true</TargetLatestRuntimePatch>
     <RuntimeFrameworkVersion>2.2.6</RuntimeFrameworkVersion>
