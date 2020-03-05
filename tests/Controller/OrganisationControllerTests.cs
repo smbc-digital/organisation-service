@@ -13,35 +13,29 @@ namespace organisation_service_tests.Controllers
 {
     public class OrganisationControllerTests
     {
-        private readonly OrganisationController _controller;
-        private readonly Mock<IOrganisationService> _mockService = new Mock<IOrganisationService>();
-
-        public OrganisationControllerTests()
-        {
-            _controller = new OrganisationController(_mockService.Object);
-        }
-
         [Fact]
         public async Task Get_ShouldCallOrganisationService_AndReturnSingleItem()
         {
-            Mock<IOrganisationService> _mockService = new Mock<IOrganisationService>();
-            _mockService.Setup(service => service.SearchAsync(It.IsAny<EOrganisationProvider>(), It.IsAny<string>()))
+            Mock<IOrganisationService> mockService = new Mock<IOrganisationService>();
+            var controller = new OrganisationController(mockService.Object);
+            mockService.Setup(service => service.SearchAsync(It.IsAny<EOrganisationProvider>(), It.IsAny<string>()))
                 .ReturnsAsync(new List<OrganisationSearchResult> {new OrganisationSearchResult()});
 
-            var response = await _controller.Get(EOrganisationProvider.CRM, "test");
+            var response = await controller.Get(EOrganisationProvider.Fake, "test");
 
-            var listResponse = Assert.IsType<OkObjectResult>(response);
-            _mockService.Verify(service => service.SearchAsync(It.IsAny<EOrganisationProvider>(), It.IsAny<string>()),Times.Once);
+            Assert.IsType<OkObjectResult>(response);
+            mockService.Verify(service => service.SearchAsync(It.IsAny<EOrganisationProvider>(), It.IsAny<string>()),Times.Once);
         }
 
         [Fact]
         public void Get_ShouldCallOrganisationService_AndError()
         {
-            Mock<IOrganisationService> _mockService = new Mock<IOrganisationService>();
-            _mockService.Setup(service => service.SearchAsync(It.IsAny<EOrganisationProvider>(), It.IsAny<string>()))
+            Mock<IOrganisationService> mockService = new Mock<IOrganisationService>();
+            var controller = new OrganisationController(mockService.Object);
+            mockService.Setup(service => service.SearchAsync(It.IsAny<EOrganisationProvider>(), It.IsAny<string>()))
                 .Throws(new ProviderException("SearchAsync: No provider selected to perform search operation"));
 
-            Assert.ThrowsAsync<ProviderException>(() => _controller.Get(EOrganisationProvider.Unknown, "test"));
+            Assert.ThrowsAsync<ProviderException>(() => controller.Get(EOrganisationProvider.Unknown, "test"));
         }
     }
 }
