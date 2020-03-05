@@ -65,15 +65,15 @@ namespace organisation_service
                 app.UseHsts();
             }
 
-            app.UseMiddleware<Availability>();
             app.UseMiddleware<ExceptionHandling>();
             app.UseHttpsRedirection();
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
             app.UseMvc();
             app.UseSwagger();
+            var swaggerPrefix = env.EnvironmentName == "local" ? string.Empty : "/organisationservice";
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "organisation_service API");
+                c.SwaggerEndpoint($"{swaggerPrefix}/swagger/v1/swagger.json", "organisation_service API");
             });
         }
     }
