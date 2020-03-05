@@ -28,14 +28,9 @@ namespace organisation_service.Services
 
         public async Task<IEnumerable<OrganisationSearchResult>> SearchAsync(EOrganisationProvider organisationProvider, string searchTerm)
         {
-            var provider = _organisationProviders.ToList()
-                .Where(_ => _.ProviderName == organisationProvider)
-                .FirstOrDefault();
-
-            if (provider == null)
-            {
-                throw new Exception("No provider found");
-            }
+            var provider = _organisationProviders
+                .ToList()
+                .FirstOrDefault(_ => _.ProviderName == organisationProvider);
 
             switch (organisationProvider)
             {

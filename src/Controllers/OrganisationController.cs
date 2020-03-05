@@ -36,11 +36,11 @@ namespace organisation_service.Controllers
                 var result = await _organisationService.SearchAsync(organisationProvider, searchTerm);
                 return Ok(result);
             }
-            catch (ProviderException e)
+            catch (ProviderException)
             {
                 return BadRequest();
             }
-            catch (Exception e)
+            catch (Exception)
             {
                 return StatusCode(500);
             }
