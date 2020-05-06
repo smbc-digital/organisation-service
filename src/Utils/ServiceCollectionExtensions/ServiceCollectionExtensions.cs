@@ -10,7 +10,11 @@ namespace organisation_service.Utils.ServiceCollectionExtensions
     {
         public static void RegisterServices(this IServiceCollection services)
         {
-            services.AddSingleton<IOrganisationService, OrganisationService>();
+            services.AddSingleton<IOrganisationService, OrganisationService>();       
+        }
+
+        public static void RegisterProviders(this IServiceCollection services)
+        {
             services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
             services.AddSingleton<IOrganisationProvider, VerintOrganisationProvider>();
         }

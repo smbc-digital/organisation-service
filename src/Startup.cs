@@ -34,6 +34,7 @@ namespace organisation_service
                     .AddCheck<TestHealthCheck>("TestHealthCheck");
 
             services.RegisterServices();
+            services.RegisterProviders();
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
