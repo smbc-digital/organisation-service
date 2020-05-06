@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Builder;
+﻿using System.Diagnostics.CodeAnalysis;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -10,7 +11,6 @@ using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
 using StockportGovUK.AspNetCore.Middleware;
 using StockportGovUK.NetStandard.Gateways;
-using System.Diagnostics.CodeAnalysis;
 
 namespace organisation_service
 {
@@ -27,13 +27,12 @@ namespace organisation_service
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddControllers();
-            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
-            services.AddSingleton<IOrganisationProvider, VerintOrganisationProvider>();
+
             services.AddSwagger();
             services.AddAvailability();
             services.AddResilientHttpClients<IGateway, Gateway>(Configuration);
             services.AddHealthChecks()
-                            .AddCheck<TestHealthCheck>("TestHealthCheck");
+                    .AddCheck<TestHealthCheck>("TestHealthCheck");
 
             services.RegisterServices();
         }
@@ -54,8 +53,8 @@ namespace organisation_service
             app.UseHttpsRedirection();
 
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
-          
-            app.UseSwagger();        
+
+            app.UseSwagger();
             app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint($"{(env.IsEnvironment("local") ? string.Empty : "/organisationservice")}/swagger/v1/swagger.json", "Organisation service API");

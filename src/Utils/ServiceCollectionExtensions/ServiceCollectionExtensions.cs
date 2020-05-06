@@ -1,5 +1,6 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using Microsoft.OpenApi.Models;
+using organisation_service.Providers;
 using organisation_service.Services;
 using System.Collections.Generic;
 
@@ -7,19 +8,11 @@ namespace organisation_service.Utils.ServiceCollectionExtensions
 {
     public static class ServiceCollectionExtensions
     {
-        public static void RegisterHelpers(this IServiceCollection services)
-        {
-
-        }
-
         public static void RegisterServices(this IServiceCollection services)
         {
             services.AddSingleton<IOrganisationService, OrganisationService>();
-        }
-
-        public static void RegisterUtils(this IServiceCollection services)
-        {
-
+            services.AddSingleton<IOrganisationProvider, FakeOrganisationProvider>();
+            services.AddSingleton<IOrganisationProvider, VerintOrganisationProvider>();
         }
 
         public static void AddSwagger(this IServiceCollection services)
