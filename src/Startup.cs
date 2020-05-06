@@ -1,16 +1,15 @@
-﻿using System.Diagnostics.CodeAnalysis;
-using Microsoft.AspNetCore.Builder;
+﻿using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using organisation_service.Providers;
 using organisation_service.Utils.HealthChecks;
 using organisation_service.Utils.ServiceCollectionExtensions;
 using StockportGovUK.AspNetCore.Availability;
 using StockportGovUK.AspNetCore.Availability.Middleware;
 using StockportGovUK.AspNetCore.Middleware;
 using StockportGovUK.NetStandard.Gateways;
+using System.Diagnostics.CodeAnalysis;
 
 namespace organisation_service
 {
