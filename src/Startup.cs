@@ -48,9 +48,12 @@ namespace organisation_service
                 app.UseHsts();
             }
 
+            app.UseHttpsRedirection();
+            app.UseRouting();
+			app.UseEndpoints(endpoints => endpoints.MapControllers());
+            
             app.UseMiddleware<Availability>();
             app.UseMiddleware<ApiExceptionHandling>();
-            app.UseHttpsRedirection();
 
             app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
 
