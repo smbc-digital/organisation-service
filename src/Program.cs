@@ -1,44 +1,38 @@
-﻿using System;
-using System.Diagnostics.CodeAnalysis;
-using System.IO;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Serilog;
-using StockportGovUK.AspNetCore.Logging.Elasticsearch.Aws;
+﻿var builder = WebApplication.CreateBuilder(args);
 
-namespace organisation_service
+builder.Services
+    .RegisterGateways(builder.Configuration)
+    .RegisterServices()
+    .RegisterProviders();
+
+builder.Services.AddSwagger();
+builder.Services.AddControllers();
+
+builder.Services
+    .AddHealthChecks()
+    .AddCheck<TestHealthCheck>("TestHealthCheck");
+
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .WriteToElasticsearchAws(builder.Configuration)
+    .CreateLogger());
+
+var app = builder.Build();
+
+if (!app.Environment.IsEnvironment("local") || !app.Environment.IsEnvironment("int"))
 {
-    [ExcludeFromCodeCoverage]
-    public class Program
-    {
-        public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("./Config/appsettings.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"./Config/appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-            .AddJsonFile("./Config/Secrets/appsettings.secrets.json", optional: false, reloadOnChange: true)
-            .AddJsonFile($"./Config/Secrets/appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.secrets.json", optional: true)
-            .AddEnvironmentVariables()
-            .Build();
-
-        public static void Main(string[] args)
-        {
-            Log.Logger = new LoggerConfiguration()
-                .ReadFrom.Configuration(Configuration)
-                .WriteToElasticsearchAws(Configuration)
-                .CreateLogger();
-
-            BuildHost(args).Run();
-        }
-
-        public static IHost BuildHost(string[] args) =>
-            Host.CreateDefaultBuilder(args)
-              .ConfigureWebHostDefaults(webBuilder =>
-              {
-                  webBuilder.UseStartup<Startup>();
-                  webBuilder.UseConfiguration(Configuration);
-              })
-              .UseSerilog()
-              .Build();
-    }
+    app.UseExceptionHandler("/Error");
 }
+
+app.UseSwagger();
+app.UseSwaggerUI(c =>
+{
+    c.SwaggerEndpoint("v1/swagger.json", "Street Service API");
+});
+
+app.UseAuthorization();
+app.MapControllers();
+app.UseHealthChecks("/healthcheck", HealthCheckConfig.Options);
+
+app.Run();
