@@ -1,49 +1,34 @@
-using System;
-using System.Threading.Tasks;
-using Microsoft.AspNetCore.Mvc;
-using organisation_service.Exceptions;
-using organisation_service.Services;
-using StockportGovUK.AspNetCore.Attributes.TokenAuthentication;
-using StockportGovUK.NetStandard.Models.Enums;
+namespace organisation_service.Controllers;
 
-
-namespace organisation_service.Controllers
+[Produces("application/json")]
+[Route("api/v1/[Controller]")]
+[ApiController]
+[TokenAuthentication]
+public class OrganisationController : ControllerBase
 {
-    [Produces("application/json")]
-    [Route("api/v1/[Controller]")]
-    [ApiController]
-    [TokenAuthentication]
-    public class OrganisationController : ControllerBase
+    private readonly IOrganisationService _organisationService;
+
+    public OrganisationController(IOrganisationService organisationService) => _organisationService = organisationService;
+
+    [HttpGet]
+    [Route("{organisationProvider}/{searchTerm}")]
+    public async Task<IActionResult> Get(EOrganisationProvider organisationProvider, string searchTerm)
     {
-        private readonly IOrganisationService _organisationService;
+        if (!ModelState.IsValid)
+            return BadRequest();
 
-        public OrganisationController(IOrganisationService organisationService)
+        try
         {
-            _organisationService = organisationService;
+            var result = await _organisationService.SearchAsync(organisationProvider, searchTerm);
+            return Ok(result);
         }
-
-        [HttpGet]
-        [Route("{organisationProvider}/{searchTerm}")]
-        public async Task<IActionResult> Get(EOrganisationProvider organisationProvider, string searchTerm)
+        catch (ProviderException)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest();
-            }
-
-            try
-            {
-                var result = await _organisationService.SearchAsync(organisationProvider, searchTerm);
-                return Ok(result);
-            }
-            catch (ProviderException)
-            {
-                return BadRequest();
-            }
-            catch (Exception)
-            {
-                return StatusCode(500);
-            }
+            return BadRequest();
+        }
+        catch (Exception)
+        {
+            return StatusCode(500);
         }
     }
 }
